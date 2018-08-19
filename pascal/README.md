@@ -1,9 +1,34 @@
-# Tail recursion in Pascal triangle
-This contains materials for speech 
+# Хвостовая рекурсия в треугольнике Паскаля
+![figure](figure.png)
 
-# TODO
-- [x] Prototype in python
-- [ ] Write it in Scala
-- [ ] Test it 
-- [ ] Draw pics that explains algorithm
-- [ ] Make a speech
+## Обратный подход
+Начинать следует не от элемента `(x, y)`, а с вершины треугольника. Следующий ряд чисел из предыдущего порождает функция, устроенная следующим образом:
+* `next([1]) => []`
+* `next([1, 2, 2, 1]) => [3, 4, 3]`
+
+```scala
+def nxt(l: List[Int], r: List[Int] = List()): List[Int] =
+    if (l.length > 1)
+        nxt(l.tail, (l(0) + l(1)) :: r)
+    else
+        r
+```
+Рекурсия в этой функции хвостовая.
+
+## Добавление единиц
+Слева и справа к очередному списку элементов следует добавлять единицы в случаях:
+* справа, если номер текущей строки `r <= x`
+* слева, если номер текущей строки `r > y - x`
+
+При наличии координат искомого элемента и текущих номера строки и очередного списока элементов, информации достаточно, чтобы свести весь результат к одному рекурсивному вызову, то есть рекурсия хвостовая.
+
+```scala
+def oneIfNot(cond : Boolean): List[Int] =
+    if (cond) List() else List(1)
+
+def pas(x: Int, y: Int, l: List[Int] = List(), r: Int = 1): Int =
+    if (r <= y)
+        pas(x, y, oneIfNot(r > y - x) ++ nxt(l) ++ oneIfNot(r > x), r + 1)
+    else
+        l(0)
+```
