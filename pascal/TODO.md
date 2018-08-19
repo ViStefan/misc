@@ -3,4 +3,4 @@
 - [x] Write it in Scala
 - [x] Test it 
 - [x] Draw pics that explains algorithm
-- [ ] Make a speech
+- [x] Make a speech
