@@ -53,20 +53,22 @@ trackers=$(echo $trackers | xargs printf -- " -a %s")
 list_size=$(echo $trackers | wc -l)
 
 process_torrent() {
-   transmission-show -a $1 | head -n2 >&2
-   echo $trackers | xargs -n2 transmission-edit $1 1> /dev/null
+   transmission-show -a "$1" | head -n2 >&2
+   echo $trackers | xargs -n2 transmission-edit "$1" 1> /dev/null
 }
 
-if [ -z $1 ]; then
-    files=$torrents_dir/*
+if [ -z "$1" ]; then
+    files=( $torrents_dir/* )
     torrents_count=$(ls $torrents_dir | wc -l)
 else
-    files=$*
+    files=( "$@" )
     torrents_count=$#
+    echo TORRENTS: $#
 fi
 
-for torrent in $files; do
-    process_torrent $torrent
+for torrent in "${files[@]}"; do
+    echo "$torrent"
+    process_torrent "$torrent"
     echo # this line drives progressbar
 done | pv -l -s $torrents_count > /dev/null
 
