@@ -1,0 +1,27 @@
+#!/bin/bash
+
+sinks=(
+    # list sinks here
+    alsa_output.pci-0000_00_1b.0.pro-output-0
+    "DDJ-SB3 Headphones"
+)
+
+# imitation of cyckled list
+sinks[${#sinks[@]}]=${sinks[0]}
+
+i=0
+
+while [ $i -lt ${#sinks[@]} ]
+do
+    if [ "$(pactl get-default-sink)" = "${sinks[$i]}" ]; then
+        ((i++))
+        pactl set-default-sink "${sinks[$i]}"
+        exit
+    fi
+    ((i++))
+done
+
+# if we reached here, default sink is not listed in $sinks
+# let's switch to first listed sink
+pactl set-default-sink "${sinks[0]}"
+

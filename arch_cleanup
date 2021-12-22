@@ -1,0 +1,61 @@
+#!/bin/bash
+
+PACMAN_CACHE_KEEP=2
+
+NCDU_EXCLUDES=/tmp/excludes # just a temporary file
+
+# list fat cache dirs and trash bins here
+# NOTE: use absolute paths if you're going to run as root
+toremove=(
+    ~/.cache/spotify/Data
+    ~/.cache/spotify/Browser/Cache
+    ~/.config/discord/Cache*
+)
+
+# list here ncdu exclude dirs to not to be counted
+# e.g. mounted devices or backup dirs
+excludes=(
+   /run
+   /mnt/timeshift 
+)
+
+docker ps
+echo
+echo "WARNING! this is your unstopped containers. \
+If something needed is omitted, start it now!"
+read -p "Prune all unused docker stuff? [y/n] " yn
+case $yn in
+    [Yy]* ) docker system prune -a -f --volumes
+esac
+
+echo
+
+read -p "Remove cached pacman packages versions (keep $PACMAN_CACHE_KEEP)? [y/n] " yn
+case $yn in
+    [Yy]* ) paccache -r -k $PACMAN_CACHE_KEEP
+esac
+
+echo
+
+for file in ${toremove[@]}; do
+    echo $file
+done
+echo
+
+read -p "This files/dirs will be removed [y/n] " yn
+case $yn in
+    [Yy]* ) for file in ${toremove[@]}; do
+        rm "$file" -R
+    done 
+esac
+
+echo
+
+read -p "Run ncdu? [y/n] " yn
+case $yn in
+    [Yy]* ) cd /
+            echo ${excludes[@]} | xargs printf -- "%s\n" > $NCDU_EXCLUDES
+            trap "rm -f $NCDU_EXCLUDES;exit 0" INT TERM EXIT
+            ncdu -X $NCDU_EXCLUDES
+esac
+
