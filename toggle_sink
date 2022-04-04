@@ -2,8 +2,8 @@
 
 sinks=(
     # list sinks here
-    alsa_output.pci-0000_00_1b.0.pro-output-0
-    "DDJ-SB3 Headphones"
+    # alsa_output.pci-0000_00_1b.0.iec958-stereo
+    "Headphones"
 )
 
 # imitation of cyckled list
